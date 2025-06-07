@@ -12,6 +12,20 @@ What is a **Block**?
     }
     ```
 
+* This grouping is generally done in cases where JS expects one statement. So we group multiple statements inside curly braces {...} and make them a block. Refer the below If() example
+    ```js
+    if(true){
+        //Compound Statement
+        var a = 10;
+        console.log(a)
+    }
+    ```
+
+* The If Code can also be written in the below way meaning just giving JS one statement.
+    ```js
+    if(true) true
+    ```
+
 * Block Scope and its accessibility example
     ```js
     {

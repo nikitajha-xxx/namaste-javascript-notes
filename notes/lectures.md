@@ -496,6 +496,21 @@ What is a **Block**?
 }
 ```
 
+- This grouping is generally done in cases where JS expects one statement. So we group multiple statements inside curly braces {...} and make them a block. Refer the below If() example
+```js
+if(true){
+    //Compound Statement
+    var a = 10;
+    console.log(a)
+}
+```
+
+- The If Code can also be written in the below way meaning just giving JS one statement.
+```js
+if(true) true
+```
+
+
 - Block Scope and its accessibility example
 
 ```js
@@ -3056,5 +3071,352 @@ Watch Live On Youtube below:
 alt="this keyword in Javascript Youtube Link"/></a>
 
 
+# Javascript Core Concepts
 
-To Be Continued...
+- **Function Borrowing**
+  - This term refers to using a function defined in one object for another object.
+  - We can use .call(), .apply(), or .bind() to set the ```this``` context and reuse functions across different objects.
+  - **call()**
+    - Immediately invokes a function and sets the this value to the specified object
+    - Syntax : functionName.call(object)
+    - Arguments can be give to call in the following manner: functionName.call(object, arg1, arg2,arg3)
+      ```js
+        let Knight = {
+            name: "Sir Coder",
+            health: 100,
+            weapon: "Code Blade",
+            attack: function() {
+                return `${this.name} attacks with ${this.weapon}!`;
+            },
+            attackEnemy: function(enemy1,enemy2){
+              return `${this.name} attacks ${enemy1} and ${enemy2} with ${this.weapon}!`;
+            }
+        };
+
+        let Wizard = {
+            name: "Lord Parser",
+            health: 50,
+            weapon: "Syntax Staff"
+        };
+
+        //if the Wizard wants to use attack method of knight
+        Knight.attack.call(Wizard) //Output : Lord Parse attacks with Syntax Staff!
+
+        //can use call method with arguments
+        Knight.attackEnemy.call(Wizard, "Troll", "Goblin") //Output: Lord Parse attacks Troll and Goblin with Syntax Staff!
+      ```
+  - **bind()**
+    - Creates a new function,which when called, has its this value set to the specified object.
+    - Syntax : const newFunc = functionName.bind(object)
+    - Arguments can be give to call in the following manner: const newFunc = functionName.bind(object, arg1, arg2,arg3)
+      ```js
+        let Knight = {
+            name: "Sir Coder",
+            health: 100,
+            weapon: "Code Blade",
+            attack: function() {
+                return `${this.name} attacks with ${this.weapon}!`;
+            },
+            attackEnemy: function(enemy1,enemy2){
+              return `${this.name} attacks ${enemy1} and ${enemy2} with ${this.weapon}!`;
+            }
+        };
+
+        let Wizard = {
+            name: "Lord Parser",
+            health: 50,
+            weapon: "Syntax Staff"
+        };
+        const borrowedAttack = knight.attack.bind(Wizard) 
+        borrowedAttack() //Output : Lord Parse attacks with Syntax Staff!
+
+        //sending arguments with bind
+        const borrowedAttackEnemy = knight.attackEnemy.bind(Wizard,  "Troll", "Goblin")
+        borrowedAttackEnemy() //Output: Lord Parse attacks Troll and Goblin with Syntax Staff!
+      ```
+  - **apply()**
+    - Works like call(), but takes an array of arguments.
+    - Syntax : functionName.apply(object, [arg1, arg2,..])
+      ```js
+        let Knight = {
+            name: "Sir Coder",
+            health: 100,
+            weapon: "Code Blade",
+            attack: function() {
+              return `${this.name} attacks with ${this.weapon}!`;
+            },
+            attackEnemy: function(enemy1,enemy2){
+              return `${this.name} attacks ${enemy1} and ${enemy2} with ${this.weapon}!`;
+            }
+        };
+
+        let Wizard = {
+            name: "Lord Parser",
+            health: 50,
+            weapon: "Syntax Staff"
+        };
+
+        //if the Wizard wants to use attack method of knight
+        Knight.attackEnemy.apply(Wizard, ["Troll", "Goblin"]) //Output: Lord Parse attacks Troll and Goblin with Syntax Staff!
+      ```
+
+- **Prototype and Prototypal Inheritance**
+  - **What are JavaScript Objects?**
+    - You may have come across this statement at some point: "In JavaScript, almost everything is an Object".
+    - Please note in this case Object and object mean two different things.
+    - Object is a constructor used to create objects. That is: one is parent/ancestor and the other is child.
+    - Object ⁠ is the grandparent.
+    - Constructors like ⁠ Array, String, Number, Function, ⁠ and ⁠ Boolean ⁠ are all descendants of ⁠ Object.
+    - They all produce offspring of different types: array, string, number, function, and Boolean. However, if you trace back to their origin, they are all Objects.
+    - The constructors listed above are responsible for the different data types you use in JavaScript.
+    - For Eg check the below code:
+      ```js
+        // Using the regular array syntax
+        const newArr = []
+
+        // Using the array constructor
+        const newArrWithConstructor = new Array()
+
+        // Using regular function syntax
+          function logArg (arg) {
+              console.log(arg)
+          }
+
+          // Using the Function constructor
+          const logArgWithConstructor = new Function('arg1', 'console.log(arg1)')
+      ```
+    - In the above example we can see that all the data types are descendants of Object.
+  - Prototype inheritance in JavaScript allows objects to inherit properties and methods from other objects.
+  - Each object has an internal link to another object called its **Prototype**.
+  - prototypes in JavaScript are used to define properties and methods that are inherited by objects down the JavaScript Object tree.
+  - That prototype object has a prototype of its own, and so on until an object is reached with null as its prototype
+  - By definition, null has no prototype and acts as the final link in this **prototype chain**
+  - If you define an array for eg: const arr = [1,2,3]
+  - ```arr.__proto__``` will give all the prototypes or built in methods that are available for an array datatype. This prototype object is same as ```Array.prototype``` object
+  - On futher doing ```arr.__proto__.__proto__``` will again give a prototype object. This prototype object will be same as ```Object.prototype``` object.
+  - Now Since Object is the grandparent on doing ```arr.__proto__.__proto__.__proto__``` or ```Object.prototype.__proto__``` the value returned will be ```null``` i.e the end of the prototypal chain.
+
+  ```js
+    let object1 = {
+      name:"nikita",
+      age:"25",
+      printDetails: function(){
+        return `Name is ${this.name} and age is ${this.age}` 
+      }
+    }
+    let object2 = {
+      name:"jane"
+    }
+    let object2.__proto__ = object1
+    console.log(object2.name) //Output: jane
+    console.log(object2.age) //Output: 25
+    console.log(object2.printDetails()) //Output: Name is jane and age is 25
+  ```
+  - In the above code, When you access the properties of object2, JavaScript first checks the object itself i.e object2. If the property or method isn’t found, it moves up the prototype chain which is object1, until it finds the property or reaches the end of the chain (null).
+  - It is possible to mutate any member of the prototype chain or even swap out the prototype at runtime, just like we did in the above code by mutating the prototype object of object2 as object1.
+  - This is the reason object2 now has access to object1 method because of prototypal inheritance.
+  - We can create custom methods by mutating prototype objects and make them available for all variables that have the same datatype. For Eg: check the below code
+    ```js
+      Function.prototype.myfunc = myfunc
+      function myfunc(){
+        return "this is custom"
+      }
+      function othFunc(){
+
+      }
+      console.log(othFunc.myfunc()) //Output: this is custom
+    ```
+- **Polyfill**
+  - A polyfill is a piece of code (usually JavaScript on the Web) used to provide modern functionality on older browsers that do not natively support it.
+  - In the below code a polyfill for the bind method has been created.
+    ```js
+      let name = {
+          firstName : "nikita",
+          lastName : "Jha",
+          age: 25
+      }
+
+      function printDetails(city,year){
+          console.log(`Name is ${this.firstName} ${this.lastName} and city is ${city} and year is ${year}`)
+      }
+
+
+      Function.prototype.myBind = function (...args){ //myBind is a ployfill
+          let obj = this //points towards printDetails function
+          let params = args.slice(1)
+          return function(...args2){
+              obj.apply(args[0], [...params, ...args2])
+          }
+      }
+
+      let printF = printDetails.myBind(name, "Mumbai")
+      printF("1999") //Output is : Name is nikita Jha and city is Mumbai and year is 1999
+
+    ```
+- **Debouncing**
+  - Debounce is a technique used to improve the performance of a system by limiting the rate at which a particular function or event is executed.
+  - It works by delaying the execution of a function or event until a certain amount of time has passed without that function or event being triggered again
+  - Debouncing is a technique that delays the execution of a function until the user stops performing a certain action for a specified amount of time
+  - For example, if you have a search bar that fetches suggestions from the backend as the user types, you can debounce the function that makes the API call, so that it only runs after the user stops typing for a few seconds. This way, you can avoid making too many API calls that might overload your server or return irrelevant results.
+  - Debouncing is typically used in scenarios where a function is called repeatedly, such as in response to user input like typing.
+    ```js
+      function getData(id){
+        //make some api call
+        console.log("Called", id)
+      }
+
+      function debounce(func, timeout){
+          let timer = null
+          return function(...args){ //this function makes a clousure with the debounce function
+              if(timer){
+                clearTimeout(timer)
+              }
+              timer = setTimeout(function(){
+                  func.apply(this,args)
+              },timeout)
+          }
+      }
+
+      const betterFunction = debounce(getData, 1000) //returns a debounced function which is given as event handler in DOM
+    ```
+  - In the above code, every time user types a character in the input field, the function ```betterFunction``` will be called.
+  - This function will first clear out any existing setimeout timers and then will wait for 1000 ms and will then call the ```getData``` function which will inturn make an api call or perform some action.
+  - ```betterFunction``` is a clousre function with its enclosed ```debounce``` function.
+  - **In case of debouncing, we call the action function(getData) only when once the difference between two consecutive characters that are typed in the text field is more than the timer given(in this case 1000 ms)**
+
+- **Throttling**
+  - Throttling limits the number of times the function can be called over a certain period.
+  - In case of throttling, once a function is called, it will then not call the same function until a certain amount of time has passed.
+  - Ensures that the function is called at a regular interval, even if the event is triggered multiple times.
+  - Useful when you want to limit the Frequency of function calls.
+  - Throttling helps limit the rate of function calls to prevent overwhelming the system while debouncing delays function execution to handle situations where rapid or frequent calls are expected.
+  - Throttling is useful in scenarios like scroll event handlers, resize event handlers, or handling user input events like mousemove or keydown, where frequent calls can lead to performance degradation.
+    ```js
+      const resizeAction = () => {
+          //do something here
+          console.log("called")
+      }
+
+      const throttle = (func, timeout)=>{
+          let callFuncFlag = true
+          return (...args)=>{
+              if(callFuncFlag){
+                  func.apply(this,args)
+                  callFuncFlag = false
+                  setTimeout(()=>{
+                      callFuncFlag = true
+                  }, timeout)
+              }
+              
+          }
+      }
+
+      const betterResizeFunction = throttle(resizeAction, 700)
+
+      window.addEventListener("resize",betterResizeFunction)
+    ```
+- **Function Currying**
+  - Currying is a technique where a function that takes multiple arguments is transformed     into a series of functions that take one argument each. It enables partial function application and enhances code flexibility.
+  - Currying can be acheived in two ways : Bind or Closures
+  - Closure Example: Let's create a curried function to calculate the total price of items with tax.
+    ``` js
+    const calculateTotalPrice = (taxRate) => (price) => price + price * (taxRate / 100);
+
+    const calculateSalesTax = calculateTotalPrice(8); // 8% sales tax
+    const totalPrice = calculateSalesTax(100); // Price with tax
+    console.log(totalPrice); // 108
+    ```
+  - Bind Example: Let's create a curried function to calculate the total price of items with tax.
+    ```js
+    const calculateTotalPrice = (taxRate) => (price) => price + price * (taxRate / 100);
+
+    const calculateSalesTax = calculateTotalPrice.bind(this,8); // 8% sales tax
+    const totalPrice = calculateSalesTax()(100); // Price with tax
+    console.log(totalPrice); // 108
+    ```
+- **Async & Defer**
+  - https://dev.to/fidalmathew/async-vs-defer-in-javascript-which-is-better-26gm
+
+- **Event Bubbling and Event Capturing**
+  - **Event Bubbling** is a concept in the DOM (Document Object Model)
+  - It happens when an element receives an event, and that event bubbles up (or you can say is transmitted or propagated) to its parent and ancestor elements in the DOM tree until it gets to the root element.
+  - This is the default behavior of events on elements unless you stop the propagation
+  - This propagation can be stopped with event.stopPropagation()
+  - **Event Capturing** is the reverse of Event Bubbling. In case of this, the event given to an element will trickle down from the root element to this element.
+  - This behaviour can only be acheived if it is specifically mentioned as a third parameter while adding even listeners, the value of this parameter should be true.
+  - Event capturing can also be stopped by using event.setopPropagation()
+
+- **Type Coercion**
+  - **Type coercion** is the process by which JavaScript (or other loosely-typed languages) automatically converts values from one data type to another when performing operations or comparisons. 
+  - ### In JavaScript:
+    - Type coercion can occur in two main contexts:
+    1. **Implicit Coercion:** Done automatically by JavaScript during operations or comparisons.
+    2. **Explicit Coercion:** Done manually by the developer using functions or operators.
+  - ### **Implicit Coercion Examples**
+    - #### **String Coercion**
+      - When a value is used in a string context, JavaScript converts it to a string.
+        ```js
+        let num = 42;
+        let result = "The number is " + num; // Implicitly converts num to "42"
+        console.log(result); // "The number is 42"
+        ```
+    - #### **Number Coercion**
+      - When a value is used in a numeric context, JavaScript attempts to convert it to a number.
+        ```js
+        let str = "123";
+        let result = str * 2; // Implicitly converts "123" to 123
+        console.log(result); // 246
+        ```
+    - #### **Boolean Coercion**
+      - When a value is used in a boolean context (e.g., conditionals), JavaScript converts it to a boolean using its **truthy** or **falsy** nature.
+        ```js
+        if ("hello") {
+          console.log("This is true!"); // Strings are truthy
+        }
+
+        if (0) {
+          console.log("This won't run!"); // 0 is falsy
+        }
+        ```
+  - ### **Explicit Coercion Examples**
+    - #### To String
+      ```js
+      let num = 42;
+      console.log(String(num)); // "42"
+      ```
+
+    - #### To Number
+      ```js
+      let str = "123";
+      console.log(Number(str)); // 123
+      ```
+
+    #### To Boolean
+      ```js
+      let value = "";
+      console.log(Boolean(value)); // false (empty string is falsy)
+      ```
+  - ### **Key Concepts of Type Coercion**
+    1. **Loose Equality (`==`):** Type coercion is applied to compare two values of different types.
+      ```js
+      "5" == 5; // true (string "5" is coerced to number 5)
+      ```
+
+    2. **Strict Equality (`===`):** No type coercion occurs; both value and type must match.
+      ```js
+      "5" === 5; // false
+      ```
+
+    3. **Truthiness and Falsiness:** Determines how values are coerced into `true` or `false` in a boolean context.
+      - **Falsy Values:** `false`, `0`, `""`, `null`, `undefined`, `NaN`.
+      - **Truthy Values:** Everything else.
+  - ### **Type Coercion in Action**
+    ```js
+    console.log(1 + "2"); // "12" (number coerced to string)
+    console.log("5" - 2); // 3 (string coerced to number)
+    console.log([] == ""); // true ([] coerced to empty string)
+    console.log([] == 0); // true (after further coercion)
+    ```
+
+
+
